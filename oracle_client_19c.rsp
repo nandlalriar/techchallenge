@@ -1,0 +1,6 @@
+oracle.install.responseFileVersion=/oracle/install/rspfmt_clientinstall_response_schema_v19.0.0
+UNIX_GROUP_NAME=oinstall
+INVENTORY_LOCATION=/u01/app/oraInventory
+ORACLE_HOME=/u01/app/oracle/product/19.3.0/client_1
+ORACLE_BASE=/u01/app/oracle
+oracle.install.client.installType=Administrator
