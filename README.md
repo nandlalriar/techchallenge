@@ -15,7 +15,8 @@ Task items are self explanatory.
 
   tasks:
 
-    - name: Create Client Home directory if it does not exist
+ 
+ - name: Create Client Home directory if it does not exist
       file:
        path: /u01/app/oracle/product/19.3.0/client_1
        state: directory
@@ -23,39 +24,47 @@ Task items are self explanatory.
        group: oinstall
        mode: '0755'
 
-    - name: Install the latest version of oracle-database-preinstall-19c package
+  
+  - name: Install the latest version of oracle-database-preinstall-19c package
       yum:
        name: oracle-database-preinstall-19c
        state: latest
 
-    - name: Copy response file for client installation
+ 
+ - name: Copy response file for client installation
       copy: src=/home/ansible/Documents/Ansible/oracle_client_19c.rsp dest=/home/oracle/oracle_client_19c.rsp mode=0777
 
-    - name: Copy Installation files to appserver and unzip the files
+ 
+ - name: Copy Installation files to appserver and unzip the files
       unarchive: src=/home/ansible/Documents/Ansible/LINUX.X64_193000_client.zip dest=/home/oracle
 
-    - name: Install Oracle client 19c
+ 
+ - name: Install Oracle client 19c
       command: "/home/oracle/client/runInstaller -silent -showProgress -ignorePrereq -ignoreSysPrereqs -waitforcompletion -responseFile /home/oracle/oracle_client_19c.rsp"
       register: client_runinstaller_output
       failed_when: "'Successfully Setup Software' not in client_runinstaller_output.stdout"
 
-    - name: run root.sh for client configuration
+ 
+ - name: run root.sh for client configuration
       command: /u01/app/oracle/product/19.3.0/client_1/root.sh
       become: true
       become_method: su
       become_user: root
 
-    - name: Copy sampledata.sql to appserver
+ 
+ - name: Copy sampledata.sql to appserver
       copy: src=/home/ansible/Documents/Ansible/sampledata.sql dest=/home/oracle/sampledata.sql mode=0777
 
-    - name: Execute sampledata.sql using sqlplus to generate data and CSV file 
+  
+  - name: Execute sampledata.sql using sqlplus to generate data and CSV file 
       shell: "echo exit | $ORACLE_HOME/bin/sqlplus -s {{user_name }}/{{ password }}@'{{ servicename }}' @/home/oracle/test.sql"
       environment:
         ORACLE_HOME: "{{oracle_home_path}}"
         LD_LIBRARY_PATH: "{{ld_library_path}}"
         PATH: "{{bin_path}}"
 
-    - name: Store file into Ansible host
+  
+  - name: Store file into Ansible host
       fetch:
        src: /tmp/gathered_data.csv
        dest: /tmp/
