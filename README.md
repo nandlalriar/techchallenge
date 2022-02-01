@@ -1,5 +1,5 @@
 # techchallenge
-OracleClientInstall.yaml.yaml file installs Oracle Client 19c on Linux application server and fetch data from Oracle database server and pushes the output CSV file to Ansible host. Main working directory is /home/ansible/Documents/Ansible.
+OracleClientInstall.yaml file installs Oracle Client 19c on Linux application server and fetch data from Oracle database server and pushes the output CSV file to Ansible host. Main working directory is /home/ansible/Documents/Ansible.
 
 It requires the client installation files to be downloaded from Oracle site and placed in /home/ansible/Documents/Ansible directory for this install to work.
 
