@@ -1,0 +1,57 @@
+- hosts: all
+  become: true
+  become_method: sudo
+
+  tasks:
+
+    - name: Create a directory if it does not exist
+      ansible.builtin.file:
+        path: /tmp/ANSIBLE
+        state: directory
+        mode: '0755'
+
+    - name: Copy script to Target Database server.
+      ansible.builtin.template:
+        src: "/repo/techchallenge/opatchversion.sh.j2"
+        dest: "/tmp/ANSIBLE/opatchversion.sh"
+        mode: '0777'
+
+    - name: Get details of Database Owner from Remote Database Server
+      ansible.builtin.shell: |
+        set -e -o pipefail
+        ps -ef|grep pmon|grep -v grep|awk '{print $1}'|cut -d' ' -f1|sort -u
+      args:
+        executable: /usr/bin/bash
+      changed_when: false
+      register: database_owner
+
+    - name: Execute script to get Patch details from remote databases.
+      ansible.builtin.command: "/usr/bin/sudo su - {{ item }} /tmp/ANSIBLE/opatchversion.sh"
+      changed_when: false
+      loop: "{{ database_owner.stdout_lines }}"
+
+    - name: List files which needs to copy Ansible Host.
+      ansible.builtin.shell: |
+        set -e -o pipefail
+        (cd /tmp; find . -maxdepth 1 -name 'opatchversion_*.csv'  -type f) | cut -d'/' -f2
+      args:
+        executable: /usr/bin/bash
+      changed_when: false
+      register: files_to_copy
+
+    - name: Copy CSV File to Ansible Host.
+      ansible.builtin.fetch:
+        src: "/tmp/{{ item }}"
+        dest: "/tmp/"
+      loop: "{{ files_to_copy.stdout_lines }}"
+
+    - name: Delete log file from remote server.
+      ansible.builtin.file:
+        path: '{{ item }}'
+        state: absent
+      loop: "{{ files_to_copy.stdout_lines }}"
+
+    - name: Delete script file from remote server.
+      ansible.builtin.file:
+        path: '/tmp/ANSIBLE'
+        state: absent
