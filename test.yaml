@@ -1,0 +1,9 @@
+--- testing
+tasks:
+    - name: Create Client Home directory if it does not exist
+      file:
+       path: /u01/app/oracle/product/19.3.0/client_1
+       state: directory
+       owner: oracle
+       group: oinstall
+       mode: '0755'
